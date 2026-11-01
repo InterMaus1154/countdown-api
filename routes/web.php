@@ -17,6 +17,7 @@ Route::middleware(AuthMiddleware::class)->group(function() {
     Route::get('/', [TimerController::class, 'index'])->name('timers.index');
     Route::get('/timers/new', [TimerController::class, 'create'])->name('timers.create');
     Route::post('/timers', [TimerController::class, 'store'])->name('timers.store');
+    Route::delete('/timers/{id}', [TimerController::class, 'delete'])->name('timers.delete');
 
 });
 

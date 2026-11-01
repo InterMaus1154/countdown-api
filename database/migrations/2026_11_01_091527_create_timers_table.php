@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('title', 50);
             $table->text('description')->nullable();
             $table->datetime('ends_at');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

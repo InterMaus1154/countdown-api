@@ -6,18 +6,20 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 class Timer extends Model
 {
-    use HasUuids;
+    use HasUuids, SoftDeletes;
 
     protected $table = 'timers';
 
     protected $casts = [
         'ends_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function uniqueIds(): array
@@ -89,5 +91,29 @@ class Timer extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getFormattedEndsAt(): string
+    {
+        if($this->getEndsAt()->format('H:i') === '00:00') {
+            return $this->getEndsAt()->format('Y-m-d');
+        }
+
+        return $this->getEndsAt()->format('Y-m-d H:i');
+    }
+
+    public function isInPast(): bool
+    {
+        return $this->getEndsAt()->isPast();
+    }
+
+    public function getDaysRemaining(): int
+    {
+        return now()->diffInDays($this->getEndsAt());
+    }
+
+    public function markDeleted(): void
+    {
+        $this->setAttribute('deleted_at', now());
     }
 }

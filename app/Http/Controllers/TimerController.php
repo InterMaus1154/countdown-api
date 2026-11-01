@@ -8,7 +8,6 @@ use App\Services\AuthService;
 use App\Services\TimerService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Psr\Log\LoggerInterface;
 
@@ -20,7 +19,8 @@ class TimerController extends Controller
 
     public function index(): View
     {
-        return view('timers.index');
+        $timers = $this->timers->all();
+        return view('timers.index', compact('timers'));
     }
 
     public function create(): View
@@ -53,5 +53,17 @@ class TimerController extends Controller
     {
         $finalMessage = sprintf('[Timer Activity] Caused by %s: Activity type: %s, %s', $this->auth->getUserId(), $activity, $message);
         $this->logger->info($finalMessage, $context);
+    }
+
+    public function delete(int $timerId): RedirectResponse
+    {
+        $timer = $this->timers->findById($timerId);
+        if(is_null($timer)) {
+            return redirect()->back()->withErrors(['not_found' => 'Timer not found']);
+        }
+
+        $timer->markDeleted();
+        $this->timers->commit($timer);
+        return redirect()->back()->with('success', 'Timer deleted');
     }
 }
