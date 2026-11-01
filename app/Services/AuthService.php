@@ -23,7 +23,14 @@ class AuthService
 
     public function getUserId(): int
     {
-        return $this->guard->user()->getAuthIdentifier();
+        return $this->getUser()->getId();
+    }
+
+    public function getUser(): User
+    {
+        /** @var User $user */
+        $user = $this->guard->user();
+        return $user;
     }
 
     public function attempt(LoginAttemptData $data): LoginAttemptResponse

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
             ->give(fn($app) => $app->make(Factory::class)->guard('web'));
 
         $this->app->bind(Hasher::class, BcryptHasher::class);
+
+
     }
 
     /**
@@ -29,6 +32,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->app->get(\Illuminate\View\Factory::class)->composer('*', function (View $view) {
+            $view->with('auth', $this->app->make(AuthService::class));
+        });
     }
 }
