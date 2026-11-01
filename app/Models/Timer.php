@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -24,12 +25,14 @@ class Timer extends Model
         return ['uuid'];
     }
 
-    public static function make(string $title, Carbon $endsAt, ?string $description = null): Timer
+    public static function make(string $title, Carbon $endsAt, int $userId, ?string $description = null): Timer
     {
         $timer = new self();
         $timer->setUuid(Str::uuid7());
         $timer->setTitle($title);
         $timer->setDescription($description);
+        $timer->setEndsAt($endsAt);
+        $timer->setUserId($userId);
         return $timer;
     }
 
@@ -76,5 +79,15 @@ class Timer extends Model
     public function setEndsAt(Carbon $carbon): void
     {
         $this->setAttribute('ends_at', $carbon);
+    }
+
+    public function setUserId(int $userId): void
+    {
+        $this->setAttribute('user_id', $userId);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
