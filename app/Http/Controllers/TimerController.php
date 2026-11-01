@@ -6,6 +6,7 @@ use App\Http\Requests\StoreTimerRequest;
 use App\Models\Timer;
 use App\Services\AuthService;
 use App\Services\TimerService;
+use App\Traits\LogsTimerActivity;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -13,6 +14,8 @@ use Psr\Log\LoggerInterface;
 
 class TimerController extends Controller
 {
+    use LogsTimerActivity;
+
     public function __construct(private AuthService $auth, private LoggerInterface $logger, private TimerService $timers)
     {
     }
@@ -46,13 +49,6 @@ class TimerController extends Controller
             $this->logTimerActivity('ERROR_CREATING_TIMER', $e->getMessage(), ['data' => $request->validated()]);
             return redirect()->back()->withErrors(['error_generic' => 'Error creating timer']);
         }
-    }
-
-
-    private function logTimerActivity(string $activity, string $message, array $context = []): void
-    {
-        $finalMessage = sprintf('[Timer Activity] Caused by %s: Activity type: %s, %s', $this->auth->getUserId(), $activity, $message);
-        $this->logger->info($finalMessage, $context);
     }
 
     public function delete(int $timerId): RedirectResponse

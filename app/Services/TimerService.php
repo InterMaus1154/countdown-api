@@ -22,7 +22,7 @@ class TimerService
 
     public function commit(Timer $timer): Timer
     {
-        if(is_null($timer->getAttribute('uuid'))) {
+        if (is_null($timer->getAttribute('uuid'))) {
             $timer->setUuid(Str::uuid7());
         }
 
@@ -33,6 +33,13 @@ class TimerService
     {
         return Timer::query()
             ->where('id', $timerId)
+            ->first();
+    }
+
+    public function findByUuid(string $uuid): ?Timer
+    {
+        return Timer::query()
+            ->where('uuid', $uuid)
             ->first();
     }
 }

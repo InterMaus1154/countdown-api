@@ -26,11 +26,11 @@ class ApiTokenController extends Controller
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $token = $this->apiTokenService->issueToken(new TokenMetadata(deviceName: $request->userAgent(), ip: $request->ip()));
+        $result = $this->apiTokenService->issueToken(new TokenMetadata(deviceName: $request->userAgent(), ip: $request->ip()));
 
         return response()->json([
-           'token' => $token->getToken(),
-           'expires_at' => $token->getExpiresAt(),
+           'token' => $result['plainTextToken'],
+           'expires_at' => $result['apiToken']->getExpiresAt(),
         ], Response::HTTP_CREATED);
     }
 }

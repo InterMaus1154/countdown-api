@@ -21,14 +21,14 @@ class AuthService
         return $this->guard->check();
     }
 
-    public function getUserId(): int
+    public function getUserId(): ?int
     {
-        return $this->getUser()->getId();
+        return $this->getUser()?->getId();
     }
 
-    public function getUser(): User
+    public function getUser(): ?User
     {
-        /** @var User $user */
+        /** @var User|null $user */
         $user = $this->guard->user();
         return $user;
     }

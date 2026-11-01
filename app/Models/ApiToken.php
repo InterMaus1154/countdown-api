@@ -55,16 +55,26 @@ class ApiToken extends Model
         return $this->getAttribute('expires_at');
     }
 
-    public static function make(?string $deviceName = null, ?string $ip = null): ApiToken
+    /**
+     * @param string|null $deviceName
+     * @param string|null $ip
+     * @return array{apiToken: ApiToken, plainToken: string}
+     */
+    public static function make(?string $deviceName = null, ?string $ip = null): array
     {
         $token = new self();
         $token->setDeviceName($deviceName);
         $token->setIpAddress($ip);
 
-        $hashToken = hash('sha256', Str::random(64));
+        $plainTextToken = Str::random(64);
+
+        $hashToken = hash('sha256', $plainTextToken);
         $token->setToken($hashToken);
         $token->setExpiresAt(now()->addMonth()->toMutable());
 
-        return $token;
+        return [
+            'apiToken' => $token,
+            'plainToken' => $plainTextToken,
+        ];
     }
 }
