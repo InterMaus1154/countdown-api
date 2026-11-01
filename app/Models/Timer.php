@@ -95,11 +95,16 @@ class Timer extends Model
 
     public function getFormattedEndsAt(): string
     {
-        if($this->getEndsAt()->format('H:i') === '00:00') {
+        if(! $this->hasTime()) {
             return $this->getEndsAt()->format('Y-m-d');
         }
 
         return $this->getEndsAt()->format('Y-m-d H:i');
+    }
+
+    public function hasTime(): bool
+    {
+        return $this->getEndsAt()->format('H:i') !== '00:00';
     }
 
     public function isInPast(): bool
@@ -115,5 +120,15 @@ class Timer extends Model
     public function markDeleted(): void
     {
         $this->setAttribute('deleted_at', now());
+    }
+
+    public function getDatePortion(): string
+    {
+        return $this->getEndsAt()->format('Y-m-d');
+    }
+
+    public function getTimePortion(): ?string
+    {
+        return $this->hasTime() ? $this->getEndsAt()->format('H:i') : null;
     }
 }

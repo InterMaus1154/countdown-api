@@ -48,7 +48,7 @@
                     <td class="text-secondary py-2 px-4 font-semibold">
                         <div class="flex gap-2">
                             @if(! $timer->isInPast())
-                                <a href="{{route('timers.create')}}"
+                                <a href="{{route('timers.edit', ['id' => $timer->getId()])}}"
                                    class="bg-white py-1 px-2 rounded-md text-lg text-headline border border-zinc-200 font-semibold tracking-wider hover:bg-base cursor-pointer">Edit</a>
                             @endif
                             <form method="POST" action="{{route('timers.delete', ['id' => $timer->getId()])}}"

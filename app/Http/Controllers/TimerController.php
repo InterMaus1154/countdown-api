@@ -30,9 +30,9 @@ class TimerController extends Controller
 
     public function store(StoreTimerRequest $request): RedirectResponse
     {
-        $constructedDateTime = sprintf('%s %s', $request->input('end_date'), $request->input('end_time'));
+        $constructedDateTime = sprintf('%s %s', $request->input('end_date'), $request->input('end_time', '00:00'));
 
-        try{
+        try {
             $timer = Timer::make(
                 title: $request->input('title'),
                 endsAt: Carbon::parse($constructedDateTime),
@@ -42,7 +42,7 @@ class TimerController extends Controller
             $this->timers->commit($timer);
             $this->logTimerActivity('TIMER_CREATED', 'Timer created with id ' . $timer->getId(), ['timer' => $timer]);
             return to_route('timers.index');
-        }catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             $this->logTimerActivity('ERROR_CREATING_TIMER', $e->getMessage(), ['data' => $request->validated()]);
             return redirect()->back()->withErrors(['error_generic' => 'Error creating timer']);
         }
@@ -58,12 +58,45 @@ class TimerController extends Controller
     public function delete(int $timerId): RedirectResponse
     {
         $timer = $this->timers->findById($timerId);
-        if(is_null($timer)) {
-            return redirect()->back()->withErrors(['not_found' => 'Timer not found']);
+        if (is_null($timer)) {
+            return redirect()->back()->withErrors(['error' => 'Timer not found']);
         }
 
         $timer->markDeleted();
         $this->timers->commit($timer);
         return redirect()->back()->with('success', 'Timer deleted');
+    }
+
+    public function edit(int $timerId): View|RedirectResponse
+    {
+        $timer = $this->timers->findById($timerId);
+        if (is_null($timer)) {
+            return to_route('timers.index')->withErrors(['error' => 'Timer not found']);
+        }
+
+        return view('timers.edit', compact('timer'));
+    }
+
+    public function update(StoreTimerRequest $request, int $timerId): RedirectResponse
+    {
+        $timer = $this->timers->findById($timerId);
+        if (is_null($timer)) {
+            return to_route('timers.index')->withErrors(['error' => 'Timer not found']);
+        }
+
+        try{
+            $timer->setTitle($request->input(('title')));
+            $timer->setDescription($request->input('description', null));
+
+            $constructedDateTime = sprintf('%s %s', $request->input('end_date'), $request->input('end_time', '00:00'));
+            $timer->setEndsAt(Carbon::parse($constructedDateTime));
+
+            $this->timers->commit($timer);
+
+            return to_route('timers.index')->with('success', 'Timer updated');
+        }catch (\Throwable $e) {
+            $this->logTimerActivity('ERROR_UPDATING_TIMER', $e->getMessage(), ['timer' => $timer, 'request' => $request->validated()]);
+            return to_route('timers.index')->withErrors(['error' => 'Error updating timer']);
+        }
     }
 }

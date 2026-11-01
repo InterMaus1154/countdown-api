@@ -18,6 +18,8 @@ Route::middleware(AuthMiddleware::class)->group(function() {
     Route::get('/timers/new', [TimerController::class, 'create'])->name('timers.create');
     Route::post('/timers', [TimerController::class, 'store'])->name('timers.store');
     Route::delete('/timers/{id}', [TimerController::class, 'delete'])->name('timers.delete');
+    Route::get('/timers/{id}/edit', [TimerController::class, 'edit'])->name('timers.edit');
+    Route::put('/timers/{id}', [TimerController::class, 'update'])->name('timers.update');
 
 });
 
