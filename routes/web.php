@@ -15,6 +15,7 @@ Route::group(['prefix' => 'auth', 'controller' => AuthController::class], functi
 
 Route::middleware(AuthMiddleware::class)->group(function() {
     Route::get('/', [TimerController::class, 'index'])->name('timers.index');
+    Route::get('/new', [TimerController::class, 'create'])->name('timers.create');
 
 });
 

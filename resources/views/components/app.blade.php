@@ -10,7 +10,7 @@
     @vite(['resources/css/app.css'])
 </head>
 <body class="bg-base flex flex-col min-h-screen">
-<header class="bg-white p-4 shadow-zinc-300 shadow-sm flex justify-between items-center gap-4">
+<header class="bg-white p-4 shadow-zinc-300 shadow-sm flex justify-between items-center gap-4 flex-wrap">
     <hgroup class="flex gap-4 items-center">
         <h1 class="text-headline text-4xl font-semibold">Countdown Timers</h1>
         @auth
