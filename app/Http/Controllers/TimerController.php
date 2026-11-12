@@ -55,11 +55,13 @@ class TimerController extends Controller
     {
         $timer = $this->timers->findById($timerId);
         if (is_null($timer)) {
+            $this->logTimerActivity('TIMER_DELETE_NOT_FOUND', 'Timer not found with id ' . $timerId);
             return redirect()->back()->withErrors(['error' => 'Timer not found']);
         }
 
         $timer->markDeleted();
         $this->timers->commit($timer);
+        $this->logTimerActivity('TIMER_DELETED', 'Timer deleted with id ' . $timerId);
         return redirect()->back()->with('success', 'Timer deleted');
     }
 
@@ -77,6 +79,7 @@ class TimerController extends Controller
     {
         $timer = $this->timers->findById($timerId);
         if (is_null($timer)) {
+            $this->logTimerActivity('TIMER_UPDATE_NOT_FOUND', 'Timer not found with id ' . $timerId);
             return to_route('timers.index')->withErrors(['error' => 'Timer not found']);
         }
 
@@ -88,6 +91,7 @@ class TimerController extends Controller
             $timer->setEndsAt(Carbon::parse($constructedDateTime));
 
             $this->timers->commit($timer);
+            $this->logTimerActivity('TIMER_UPDATED', 'Timer updated with id ' . $timerId);
 
             return to_route('timers.index')->with('success', 'Timer updated');
         }catch (\Throwable $e) {

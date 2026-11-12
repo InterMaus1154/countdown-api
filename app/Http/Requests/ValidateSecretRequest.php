@@ -3,7 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Psr\Log\LoggerInterface;
 
 class ValidateSecretRequest extends FormRequest
 {
@@ -25,5 +27,22 @@ class ValidateSecretRequest extends FormRequest
         return [
             'secret' => 'required|string',
         ];
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        // Log only the failing field names, never the submitted values (the secret).
+        app(LoggerInterface::class)->warning(
+            sprintf(
+                '[API Activity] %s %s /%s: Activity type: VALIDATE_BAD_REQUEST, Failed fields: %s',
+                $this->ip() ?? '',
+                $this->method(),
+                $this->path(),
+                implode(', ', array_keys($validator->errors()->messages()))
+            ),
+            ['user_agent' => $this->userAgent()]
+        );
+
+        parent::failedValidation($validator);
     }
 }
