@@ -11,6 +11,7 @@ set -euo pipefail
 BRANCH="${BRANCH:-master}"
 PHP="${PHP:-php}"
 COMPOSER="${COMPOSER:-composer}"
+NPM="${NPM:-npm}"
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
@@ -27,6 +28,13 @@ git pull --ff-only origin "$BRANCH"
 
 echo "==> Installing Composer dependencies"
 $COMPOSER install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+
+echo "==> Installing npm dependencies"
+# Dev dependencies are required here: the build tooling (e.g. Vite) lives in devDependencies.
+$NPM ci --no-audit --no-fund
+
+echo "==> Building dashboard assets"
+$NPM run build
 
 echo "==> Running migrations"
 $PHP artisan migrate --force
